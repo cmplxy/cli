@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 import config from '@/config'
 
@@ -14,6 +14,18 @@ export type ErrorResponse = {
 class API {
   async initRepo(email: string, repo: string, secret: string): Promise<SuccessResponse> {
     return await axios.post(`${config.server}/git/init`, { email, repo, secret })
+  }
+
+  // --- error handling
+
+  unwrapError(error: AxiosError): string {
+    if (error.response) {
+      return (error.response.data as ErrorResponse).error
+    } else if (error.request) {
+      return 'No response from server'
+    } else {
+      return error.message
+    }
   }
 }
 

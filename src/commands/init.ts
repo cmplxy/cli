@@ -4,8 +4,11 @@ import inquirer from 'inquirer'
 import path from 'path'
 
 import api from '@/api'
+import config from '@/config'
+import { Hooks } from '@/hooks'
 import { log, verboseLog } from '@/logger'
-import { fatal, findGitRoot, generateSecretKey } from '@/utils'
+import { ProjectConfig } from '@/types'
+import { fatal, findGitRoot, generateSecretKey, logErrorMessage } from '@/utils'
 
 export default async function (email: string) {
   const root = findGitRoot()
@@ -15,7 +18,15 @@ export default async function (email: string) {
 
   if (!fs.existsSync(configPath)) {
     await registerRepo(email, root, configPath)
+  } else {
+    verboseLog('Config file already exists, skipping registration')
   }
+
+  const hooks = new Hooks(root)
+  const okpushCommand = process.argv.slice(0, 2).join(' ')
+
+  verboseLog('Installing hooks with command', okpushCommand)
+  hooks.initAllHooks(okpushCommand)
 
   log(`Return to the website for instructions.`)
 }
@@ -47,17 +58,22 @@ async function registerRepo(email: string, root: string, configPath: string) {
   if (!origin) return fatal('No remote specified')
 
   const secret = generateSecretKey()
-  const initialConfig = {
-    [origin]: {
-      secret,
+  const initialConfig: ProjectConfig = {
+    remotes: {
+      [origin]: {
+        secret,
+      },
     },
   }
+
+  if (config.customServer) initialConfig.server = config.server
 
   // attempt to register with the server
   try {
     await api.initRepo(email, origin, secret)
     fs.writeFileSync(configPath, JSON.stringify(initialConfig))
-  } catch (e) {}
-
-  log(`Repository was initialized, and a config file was generated in ${configPath}.`)
+    log(`Repository was initialized, and a config file was generated in ${configPath}.`)
+  } catch (e) {
+    logErrorMessage(e)
+  }
 }

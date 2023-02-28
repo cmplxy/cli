@@ -1,5 +1,9 @@
 export type ProjectConfig = {
-  [remote: string]: {
-    secret: string
+  server?: string
+
+  remotes: {
+    [remote: string]: {
+      secret: string
+    }
   }
 }

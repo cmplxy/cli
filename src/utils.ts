@@ -1,6 +1,10 @@
+import { isAxiosError } from 'axios'
+import chalk from 'chalk'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
+
+import api from '@/api'
 
 // walk up the tree until we find the .git folder
 export function findGitRoot() {
@@ -22,7 +26,19 @@ export function generateSecretKey() {
     .replace(/\=/g, '')
 }
 
+export function logErrorMessage(e: any) {
+  if (isAxiosError(e)) {
+    error(api.unwrapError(e))
+  } else {
+    error(e)
+  }
+}
+
+export function error(...args: any[]) {
+  console.error(chalk.red('Error:'), ...args)
+}
+
 export function fatal(...args: any[]) {
-  console.error(...args)
+  console.error(chalk.red('Fatal:'), ...args)
   process.exit(1)
 }

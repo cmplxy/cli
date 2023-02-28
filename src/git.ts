@@ -1,7 +1,8 @@
 import { spawnSync } from 'child_process'
 
-export function git(args: string[]) {
+export function git(cwd: string, args: string[]) {
   const result = spawnSync(`git`, args, {
+    cwd,
     encoding: 'utf-8',
   })
 
