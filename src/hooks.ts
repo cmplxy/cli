@@ -46,13 +46,17 @@ export class Hooks {
       const contents = fs.readFileSync(file, 'utf-8')
       if (contents.includes(action)) return
       else if (action.includes('okpush')) throw 'unknown okpush content detected in hook ' + type
-      return
+      else {
+        verboseLog('Updating existing hook:', file)
+        const newContents = `${contents}\n${action}`
+        fs.writeFileSync(file, newContents)
+      }
+    } else {
+      verboseLog('Creating hook:', file)
+      const contents = `#!/bin/sh\n\n${action}`
+      fs.writeFileSync(file, contents)
+      fs.chmodSync(file, '755')
     }
-
-    verboseLog('Creating hook:', file)
-    const contents = `#!/bin/sh\n\n${action}`
-    fs.writeFileSync(file, contents)
-    fs.chmodSync(file, '755')
   }
 
   initAllHooks(okpushCommand: string) {
@@ -64,7 +68,8 @@ export class Hooks {
       'post-rewrite',
     ]
     for (const hook of supported) {
-      const command = `${okpushCommand} ${hook}`
+      const suffix = hook.startsWith('post') ? '&' : ';'
+      const command = `${okpushCommand} ${hook}${suffix}`
       this.createHook(hook, command)
     }
   }

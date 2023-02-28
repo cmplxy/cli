@@ -1,6 +1,7 @@
 import { program } from 'commander'
 
 import init from '@/commands/init'
+import install from '@/commands/install'
 import postCheckout from '@/commands/post-checkout'
 import postCommit from '@/commands/post-commit'
 import postRewrite from '@/commands/post-rewrite'
@@ -23,7 +24,7 @@ export default function () {
     .option('--force', 'Force re-initialization of the repo')
     .action(init)
 
-  program.command('install').description('Install git hooks if not installed.').action(postCheckout)
+  program.command('install').description('Install git hooks if not installed.').action(install)
 
   const hookOpts = { hidden: true }
   program.command('post-checkout', hookOpts).action(postCheckout)
