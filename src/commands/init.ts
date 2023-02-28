@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import fs from 'fs'
 import ini from 'ini'
 import inquirer from 'inquirer'
@@ -8,16 +9,20 @@ import config from '@/config'
 import { Hooks } from '@/hooks'
 import { log, verboseLog } from '@/logger'
 import { ProjectConfig } from '@/types'
-import { fatal, findGitRoot, generateSecretKey, logErrorMessage } from '@/utils'
+import { fatal, findGitRoot, generateSecretKey, logErrorMessage, readConfig } from '@/utils'
 
-export default async function (email: string) {
+type Options = {
+  force?: boolean
+}
+
+export default async function (email: string, options: Options) {
   const root = findGitRoot()
-  verboseLog('Initializing in', root)
+  verboseLog('Initializing in', root, options)
 
-  const configPath = path.join(root, '.okpush')
+  const existingConfig = readConfig(root)
 
-  if (!fs.existsSync(configPath)) {
-    await registerRepo(email, root, configPath)
+  if (!existingConfig || options.force) {
+    await registerRepo(email, root, path.join(root, '.okpush'))
   } else {
     verboseLog('Config file already exists, skipping registration')
   }
@@ -28,7 +33,7 @@ export default async function (email: string) {
   verboseLog('Installing hooks with command', okpushCommand)
   hooks.initAllHooks(okpushCommand)
 
-  log(`Return to the website for instructions.`)
+  log(chalk.yellowBright(`\nPlease return to the okpush website for next steps.`))
 }
 
 async function registerRepo(email: string, root: string, configPath: string) {

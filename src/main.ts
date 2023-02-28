@@ -20,18 +20,22 @@ export default function () {
     .command('init')
     .description('Initialize okpush in a git repo')
     .argument('<email>', 'Your okpush email address. If ommitted, your git identity will be used.')
+    .option('--force', 'Force re-initialization of the repo')
     .action(init)
 
-  program.command('post-checkout').action(postCheckout)
+  program.command('install').description('Install git hooks if not installed.').action(postCheckout)
 
-  program.command('post-commit').action(postCommit)
+  const hookOpts = { hidden: true }
+  program.command('post-checkout', hookOpts).action(postCheckout)
 
-  program.command('post-rewrite').action(postRewrite)
+  program.command('post-commit', hookOpts).action(postCommit)
 
-  program.command('pre-commit').action(preCommit)
+  program.command('post-rewrite', hookOpts).action(postRewrite)
 
-  program.command('pre-push').action(prePush)
+  program.command('pre-commit', hookOpts).action(preCommit)
 
-  program.parse()
-  config.options = program.opts
+  program.command('pre-push', hookOpts).action(prePush)
+
+  const options = program.parse()
+  config.options = options
 }

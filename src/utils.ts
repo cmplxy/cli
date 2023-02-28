@@ -5,6 +5,8 @@ import fs from 'fs'
 import path from 'path'
 
 import api from '@/api'
+import { overrideServer } from '@/config'
+import { ProjectConfig } from '@/types'
 
 // walk up the tree until we find the .git folder
 export function findGitRoot() {
@@ -24,6 +26,28 @@ export function generateSecretKey() {
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/\=/g, '')
+}
+
+export function readConfig(root: string = findGitRoot()): ProjectConfig | null {
+  const configPath = path.join(root, '.okpush')
+  if (!fs.existsSync(configPath)) {
+    return null
+  }
+
+  const data = fs.readFileSync(configPath, 'utf-8')
+  const config: ProjectConfig = JSON.parse(data)
+  if (config.server) overrideServer(config.server)
+  return config
+}
+
+export function unwrapError(e: any): string {
+  if (isAxiosError(e)) {
+    return api.unwrapError(e)
+  } else if (e instanceof Error) {
+    return e.message
+  } else {
+    return e.toString()
+  }
 }
 
 export function logErrorMessage(e: any) {

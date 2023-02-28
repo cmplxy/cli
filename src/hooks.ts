@@ -25,7 +25,7 @@ export class Hooks {
     this.hookPath = path.join(this.gitDir, 'hooks')
 
     // hook path can be overwritten by config
-    const overriddenPath = git(root, ['config', 'core.hooksPath'])
+    const overriddenPath = git(['config', 'core.hooksPath'])
     if (overriddenPath.length) {
       this.hookPath = overriddenPath
       verboseLog('Custom hook path:', this.hookPath)
