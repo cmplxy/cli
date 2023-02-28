@@ -20,16 +20,18 @@ export class Hooks {
   gitDir: string = ''
   hookPath: string = ''
 
-  constructor(gitDir: string) {
-    this.gitDir = gitDir
-    this.hookPath = path.join(gitDir, 'hooks')
+  constructor(root: string) {
+    this.gitDir = path.join(root, '.git')
+    this.hookPath = path.join(this.gitDir, 'hooks')
 
     // hook path can be overwritten by config
-    const overriddenPath = git(gitDir, ['config', 'core.hooksPath'])
+    const overriddenPath = git(root, ['config', 'core.hooksPath'])
     if (overriddenPath.length) {
       this.hookPath = overriddenPath
       verboseLog('Custom hook path:', this.hookPath)
     }
+
+    if (!fs.existsSync(this.hookPath)) fs.mkdirSync(this.hookPath, { recursive: true })
   }
 
   getHook(type: HookType) {
@@ -40,8 +42,6 @@ export class Hooks {
 
   createHook(type: HookType, action: string) {
     const file = this.getHook(type)
-    verboseLog('Creating hook:', file)
-
     if (fs.existsSync(file)) {
       const contents = fs.readFileSync(file, 'utf-8')
       if (contents.includes(action)) return
@@ -49,11 +49,10 @@ export class Hooks {
       return
     }
 
-    const contents = `#!/bin/sh
-
-    ${action}
-    `
+    verboseLog('Creating hook:', file)
+    const contents = `#!/bin/sh\n\n${action}`
     fs.writeFileSync(file, contents)
+    fs.chmodSync(file, '755')
   }
 
   initAllHooks(okpushCommand: string) {

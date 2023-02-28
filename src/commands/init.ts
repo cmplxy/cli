@@ -73,6 +73,7 @@ async function registerRepo(email: string, root: string, configPath: string) {
     await api.initRepo(email, origin, secret)
     fs.writeFileSync(configPath, JSON.stringify(initialConfig))
     log(`Repository was initialized, and a config file was generated in ${configPath}.`)
+    log(`Remember to commit the config file to your repo.`)
   } catch (e) {
     logErrorMessage(e)
   }
