@@ -6,6 +6,7 @@ import path from 'path'
 
 import api from '@/api'
 import config from '@/config'
+import { git } from '@/git'
 import { Hooks } from '@/hooks'
 import { log, verboseLog } from '@/logger'
 import { ProjectConfig } from '@/types'
@@ -21,8 +22,14 @@ export default async function (email: string, options: Options) {
 
   const existingConfig = readConfig(root)
 
-  if (!existingConfig || options.force) {
+  if (!existingConfig) {
     await registerRepo(email, root, path.join(root, '.okpush'))
+  } else if (options.force) {
+    await Promise.all(
+      Object.keys(existingConfig.remotes).map((remote) =>
+        api.initRepo(email, remote, existingConfig.remotes[remote].secret)
+      )
+    )
   } else {
     verboseLog('Config file already exists, skipping registration')
   }
@@ -77,6 +84,7 @@ async function registerRepo(email: string, root: string, configPath: string) {
   try {
     await api.initRepo(email, origin, secret)
     fs.writeFileSync(configPath, JSON.stringify(initialConfig))
+    git(['add', configPath])
     log(`Repository was initialized, and a config file was generated in ${configPath}.`)
     log(`Remember to commit the config file to your repo.`)
   } catch (e) {
