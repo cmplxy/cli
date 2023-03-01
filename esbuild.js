@@ -5,7 +5,7 @@ import { nodeExternalsPlugin } from 'esbuild-node-externals'
 const config = {
   entryPoints: ['src/main.ts'],
   bundle: true,
-  outfile: 'dist/main.js',
+  outfile: 'dist/index.js',
   platform: 'node',
   target: 'node14',
   plugins: [tsPaths(), nodeExternalsPlugin()],

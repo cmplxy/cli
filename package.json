@@ -1,9 +1,13 @@
 {
-  "name": "okpush-cli",
+  "name": "okpush",
   "version": "0.0.1",
   "description": "A git hook management tool",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okpush/cli.git"
+  },
   "scripts": {
     "build": "node esbuild.js",
     "clean": "rm -rf out",
