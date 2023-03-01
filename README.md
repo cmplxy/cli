@@ -1,72 +1,54 @@
-# okpush
+# okpush-cli
 
-okpush is a whole-codebase code quality tool for Javascript/Typescript to help teams write better code.
+okpush-cli is command-line utility to manage git hooks for the [okpush.io](https://okpush.io) service.
 
 ## Usage
 
-Navigate to your project directory and run complexity using npx.
+Initialize a new repository for okpush:
 
 ```bash
-npx okpush
+npx okpush init <your email address>
 ```
 
-This will analyze your code and open the results in your browser.
+Install hooks for a repository that already has a `.okpush` file:
 
-You can also install okpush as a devDependency.
-
-## okpush.config.js
-
-Options can be configured through a config file in your project root directory. An example is below.
-
-```javascript
-export default {
-  // analyze files matching glob
-  fileGlob: ['**/*.ts', '**/*.tsx'],
-
-  // exclude files found in these folders
-  excludeFolders: ['**/generated'],
-
-  // pattern for test files
-  testFileGlob: ['**/*.test.*'],
-
-  // individual test option overrides
-  testOptions: {
-    fileComplexity: {
-      enabled: false,
-    },
-    duplicateBlocks: {
-      duplicateCountThreshold: 2,
-    },
-  },
-}
+```bash
+npx okpush install
 ```
 
-## Project philosphy (aka why another linter?)
+## Installation
 
-**Big picture insight** - rather than scrutinizing individual lines of code, we seek to give team
-leaders and project maintainers a overview of codebase quality, to answer questions such as:
+okpush-cli can be run directly from npx with `npx okpush`.
 
-- Is the code getting better or worse over time?
-- What is the impact of a particular pull request?
-- Who has been most helpful in maintaining codebase quality?
+You can also install it into your javascript project as a dev dependency. This way you can write
+a script to automatically install okpush hooks for everyone.
 
-**Incremental progress** - rather than overwhelm developers with thousands of errors to fix out of
-the box, we seek to provide a clear path to improving code quality. By helping teams leave the code
-better than they found it, code quality can be achieved without halting feature development.
+```bash
+npm install okpush --save-dev
+# or
+yarn install -D okpush
+```
 
-**Developer friendly** - writing good software is hard, tools like this should make life easier.
-Understanding and fixing results, tight integration with IDE and CI/CD, and writing new checks
-should all be delightful experiences.
+## Hooks
 
-## Contributing
+The following hooks are currently supported:
 
-This project is currently focused on Javascript / Typescript, but I'd like to support additional
-languages once the initial version feels complete. If you have an idea for a code quality check
-that you'd like to see in your project, please open an issue.
+- `pre-commit` - run commands to check whether commit is allowed (synchronous)
+- `post-commit` - run commands after a commit succeeds (async)
+- `post-rewrite` - run commands after a commit is modified (async)
+- `pre-push` - run commands to check whether push is allowed (synchronous)
+- `post-checkout` - run commands after a new branch is checked out (async)
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would
-like to change.
+These commands can be triggered directly as commands with okpush-cli as well by running:
+
+```bash
+okpush pre-commit # any supported hook
+```
+
+## Support
+
+If something is going wrong, please run okpush with the `-v` flag and create an issue with the output of the command.
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
