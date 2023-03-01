@@ -1,6 +1,6 @@
 {
   "name": "okpush-cli",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A git hook management tool",
   "main": "index.js",
   "type": "module",
@@ -12,7 +12,7 @@
     "test": "yarn tsc && mocha"
   },
   "author": "Tim Su",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "bin": {
     "okpush": "./cli.js"
   },
