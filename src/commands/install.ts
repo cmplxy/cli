@@ -7,8 +7,6 @@ export default async function () {
   if (!config) {
     return fatal('Please initialize okpush in this repository first.')
   }
-
   const hooks = new Hooks(root)
-  const okpushCommand = process.argv.slice(0, 2).join(' ')
-  hooks.initAllHooks(okpushCommand)
+  hooks.initAllHooks()
 }

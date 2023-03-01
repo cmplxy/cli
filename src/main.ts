@@ -9,6 +9,7 @@ import preCommit from '@/commands/pre-commit'
 import prePush from '@/commands/pre-push'
 import config, { overrideServer } from '@/config'
 import { setVerbose } from '@/logger'
+import { fatal } from '@/utils'
 
 export default function () {
   program
@@ -22,21 +23,28 @@ export default function () {
     .description('Initialize okpush in a git repo')
     .argument('<email>', 'Your okpush email address. If ommitted, your git identity will be used.')
     .option('--force', 'Force re-initialization of the repo')
-    .action(init)
+    .action(actionWrapper(init))
 
-  program.command('install').description('Install git hooks if not installed.').action(install)
+  program
+    .command('install')
+    .description('Install git hooks if not installed.')
+    .action(actionWrapper(install))
 
   const hookOpts = { hidden: true }
-  program.command('post-checkout', hookOpts).action(postCheckout)
+  program.command('post-checkout', hookOpts).action(actionWrapper(postCheckout))
 
-  program.command('post-commit', hookOpts).action(postCommit)
+  program.command('post-commit', hookOpts).action(actionWrapper(postCommit))
 
-  program.command('post-rewrite', hookOpts).action(postRewrite)
+  program.command('post-rewrite', hookOpts).action(actionWrapper(postRewrite))
 
-  program.command('pre-commit', hookOpts).action(preCommit)
+  program.command('pre-commit', hookOpts).action(actionWrapper(preCommit))
 
-  program.command('pre-push', hookOpts).action(prePush)
+  program.command('pre-push', hookOpts).action(actionWrapper(prePush))
 
   const options = program.parse()
   config.options = options
+}
+
+function actionWrapper(fn: (...args: any[]) => Promise<any>) {
+  return (...args: any[]) => fn(...args).catch(fatal)
 }

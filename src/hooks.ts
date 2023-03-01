@@ -45,10 +45,13 @@ export class Hooks {
     if (fs.existsSync(file)) {
       const contents = fs.readFileSync(file, 'utf-8')
       if (contents.includes(action)) return
-      else if (action.includes('okpush')) throw 'unknown okpush content detected in hook ' + type
       else {
         verboseLog('Updating existing hook:', file)
-        const newContents = `${contents}\n${action}`
+        const filteredContents = contents
+          .split('\n')
+          .filter((line) => !line.includes('okpush'))
+          .join('\n')
+        const newContents = `${filteredContents}\n${action}`
         fs.writeFileSync(file, newContents)
       }
     } else {
@@ -59,7 +62,12 @@ export class Hooks {
     }
   }
 
-  initAllHooks(okpushCommand: string) {
+  initAllHooks() {
+    const argParts = process.argv.slice(0, 2)
+    if (argParts[0].endsWith('/node')) argParts[0] = 'node'
+    const okpushCommand = argParts.join(' ')
+    verboseLog('okpush command:', okpushCommand)
+
     const supported: HookType[] = [
       'pre-commit',
       'post-commit',

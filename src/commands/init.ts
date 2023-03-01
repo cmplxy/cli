@@ -35,10 +35,7 @@ export default async function (email: string, options: Options) {
   }
 
   const hooks = new Hooks(root)
-  const okpushCommand = process.argv.slice(0, 2).join(' ')
-
-  verboseLog('Installing hooks with command', okpushCommand)
-  hooks.initAllHooks(okpushCommand)
+  hooks.initAllHooks()
 
   log(chalk.yellowBright(`\nPlease return to the okpush website for next steps.`))
 }
