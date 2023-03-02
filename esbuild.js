@@ -12,10 +12,9 @@ const config = {
   format: 'esm',
 }
 
-const context = await esbuild.context(config)
-
 if (process.argv.includes('--watch')) {
+  const context = await esbuild.context(config)
   await context.watch()
 } else {
-  await context.dispose()
+  await esbuild.build(config)
 }
