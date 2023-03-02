@@ -19,14 +19,16 @@ type RepoData = {
 
 class API {
   async initRepo(email: string, repo: string, secret: string): Promise<SuccessResponse> {
-    return await axios.post(`${config.server}/git/init`, { email, repo, secret })
+    const response = await axios.post(`${config.server}/git/init`, { email, repo, secret })
+    return response.data
   }
 
   async sendCommit(
     repo: RepoData,
     data: GitShowData & { branch: string }
-  ): Promise<SuccessResponse> {
-    return await axios.post(`${config.server}/git/commit`, { ...repo, ...data })
+  ): Promise<{ sync_url?: string }> {
+    const response = await axios.post(`${config.server}/git/commit`, { ...repo, ...data })
+    return response.data
   }
 
   // --- error handling

@@ -13,7 +13,8 @@
     "clean": "rm -rf out",
     "go": "node ./cli.js",
     "okpush": "yarn build && yarn go",
-    "test": "yarn tsc && mocha"
+    "test": "yarn tsc && mocha",
+    "watch": "node esbuild.js --watch"
   },
   "author": "Tim Su",
   "license": "GPL-3.0",

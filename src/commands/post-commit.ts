@@ -1,5 +1,5 @@
 import api from '@/api'
-import { gitBranch, gitShow } from '@/git'
+import { git, gitBranch, gitShow } from '@/git'
 import { verboseLog } from '@/logger'
 import { readConfig, unwrapError } from '@/utils'
 
@@ -15,7 +15,20 @@ export default async function () {
       Object.keys(config.remotes).map(async (remote) => {
         const secret = config.remotes[remote].secret
         const repo = { repo: remote, secret }
-        return api.sendCommit(repo, { ...result, branch })
+        return api.sendCommit(repo, { ...result, branch }).then((response) => {
+          if (response.sync_url) {
+            verboseLog(`Sync URL: ${response.sync_url}`)
+            const syncBranch = `okpush/${result.email}/${branch}`
+            let pushUrl
+            if (remote.startsWith('git@')) {
+              pushUrl = `git@${response.sync_url}`
+            } else {
+              pushUrl = `https://${response.sync_url.replace(':', '/')}`
+            }
+
+            git(['push', '-f', pushUrl, `HEAD:${syncBranch}`])
+          }
+        })
       })
     )
   } catch (e) {
