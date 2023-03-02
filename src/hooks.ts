@@ -76,8 +76,12 @@ export class Hooks {
       'post-rewrite',
     ]
     for (const hook of supported) {
-      const suffix = hook.startsWith('post') ? '&' : ';'
-      const command = `${okpushCommand} ${hook}${suffix}`
+      let command
+      if (hook.startsWith('post')) {
+        command = `nohup ${okpushCommand} ${hook} &>/dev/null &`
+      } else {
+        command = `${okpushCommand} ${hook}`
+      }
       this.createHook(hook, command)
     }
   }
