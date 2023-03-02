@@ -26,7 +26,7 @@ export default async function () {
               pushUrl = `https://${response.sync_url.replace(':', '/')}`
             }
 
-            git(['push', '-f', pushUrl, `HEAD:${syncBranch}`])
+            git(['push', '--no-verify', '-f', pushUrl, `HEAD:${syncBranch}`])
           }
         })
       })
