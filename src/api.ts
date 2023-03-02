@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 
 import config from '@/config'
-import { GitShowData } from '@/git'
+import { GitLogData, GitShowData } from '@/git'
 
 export type SuccessResponse = {
   success: true
@@ -25,9 +25,15 @@ class API {
 
   async sendCommit(
     repo: RepoData,
-    data: GitShowData & { branch: string }
+    branch: string,
+    data: GitShowData
   ): Promise<{ sync_url?: string }> {
-    const response = await axios.post(`${config.server}/git/commit`, { ...repo, ...data })
+    const response = await axios.post(`${config.server}/git/commit`, { branch, ...repo, ...data })
+    return response.data
+  }
+
+  async syncCommits(repo: RepoData, commits: GitLogData[]): Promise<SuccessResponse> {
+    const response = await axios.post(`${config.server}/git/sync`, { ...repo, commits })
     return response.data
   }
 

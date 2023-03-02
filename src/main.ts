@@ -7,6 +7,7 @@ import postCommit from '@/commands/post-commit'
 import postRewrite from '@/commands/post-rewrite'
 import preCommit from '@/commands/pre-commit'
 import prePush from '@/commands/pre-push'
+import sync from '@/commands/sync'
 import config, { overrideServer } from '@/config'
 import { setVerbose } from '@/logger'
 import { fatal } from '@/utils'
@@ -21,14 +22,21 @@ export default function () {
   program
     .command('init')
     .description('Initialize okpush in a git repo')
-    .argument('<email>', 'Your okpush email address. If ommitted, your git identity will be used.')
-    .option('--force', 'Force re-initialization of the repo')
+    .argument('<email>', 'Your okpush email address.')
+    .option('--force', 'Force re-registration of the repo')
     .action(actionWrapper(init))
 
   program
     .command('install')
     .description('Install git hooks if not installed.')
     .action(actionWrapper(install))
+
+  program
+    .command('sync')
+    .description('Sync past git history to okpush. Defaults to last 100 commits.')
+    .option('-s, --since <date>', 'sync all history since date')
+    .option('-c, --count <count>', 'sync last n commits')
+    .action(actionWrapper(sync))
 
   const hookOpts = { hidden: true }
   program.command('post-checkout', hookOpts).action(actionWrapper(postCheckout))

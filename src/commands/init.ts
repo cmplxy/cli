@@ -5,6 +5,7 @@ import inquirer from 'inquirer'
 import path from 'path'
 
 import api from '@/api'
+import sync from '@/commands/sync'
 import config from '@/config'
 import { git } from '@/git'
 import { Hooks } from '@/hooks'
@@ -24,6 +25,9 @@ export default async function (email: string, options: Options) {
 
   if (!existingConfig) {
     await registerRepo(email, root, path.join(root, '.okpush'))
+
+    // automatically sync commits
+    await sync({})
   } else if (options.force) {
     await Promise.all(
       Object.keys(existingConfig.remotes).map((remote) =>

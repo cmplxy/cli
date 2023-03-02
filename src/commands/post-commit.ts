@@ -15,7 +15,7 @@ export default async function () {
       Object.keys(config.remotes).map(async (remote) => {
         const secret = config.remotes[remote].secret
         const repo = { repo: remote, secret }
-        return api.sendCommit(repo, { ...result, branch }).then((response) => {
+        return api.sendCommit(repo, branch, result).then((response) => {
           if (response.sync_url) {
             verboseLog(`Sync URL: ${response.sync_url}`)
             const syncBranch = `okpush/${result.email}/${branch}`
