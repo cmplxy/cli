@@ -27,7 +27,7 @@ export default async function (email: string, options: Options) {
     await registerRepo(email, root, path.join(root, '.okpush'))
 
     // automatically sync commits
-    await sync({})
+    await sync({ internal: true, since: '90 days ago' })
   } else if (options.force) {
     await Promise.all(
       Object.keys(existingConfig.remotes).map((remote) =>

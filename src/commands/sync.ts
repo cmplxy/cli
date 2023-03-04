@@ -7,6 +7,7 @@ import { fatal, findGitRoot, logErrorMessage, readConfig, unwrapError } from '@/
 type Options = {
   since?: string
   count?: string
+  internal?: boolean
 }
 
 export default async function (options: Options) {
@@ -28,16 +29,24 @@ export default async function (options: Options) {
   }
 
   const commits = gitLog(root, ...args)
-  log(`Syncing ${commits.length} commits...`)
+  if (!commits.length && !options.internal) return fatal('No commits to sync.')
 
   try {
-    await Promise.all(
-      Object.keys(config.remotes).map(async (remote) => {
-        const secret = config.remotes[remote].secret
-        const repo = { repo: remote, secret }
-        return api.syncCommits(repo, commits)
-      })
-    )
+    // sync in batches of 500
+    const batchSize = 500
+    for (let i = 0; i < commits.length; i += batchSize) {
+      const batch = commits.slice(i, i + batchSize)
+      if (batch.length < batchSize) log(`Syncing ${batch.length} commits...`)
+      else log(`Syncing ${i + batchSize} of ${commits.length} commits...`)
+
+      await Promise.all(
+        Object.keys(config.remotes).map(async (remote) => {
+          const secret = config.remotes[remote].secret
+          const repo = { repo: remote, secret }
+          return api.syncCommits(repo, batch)
+        })
+      )
+    }
   } catch (e) {
     logErrorMessage(e)
   }
