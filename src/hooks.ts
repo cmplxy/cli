@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
+import config from '@/config'
 import { git } from '@/git'
 import { verboseLog } from '@/logger'
 
@@ -65,15 +66,16 @@ export class Hooks {
   initAllHooks() {
     const argParts = process.argv.slice(0, 2)
     if (argParts[0].endsWith('/node')) argParts[0] = 'node'
+
     const okpushCommand = argParts.join(' ')
     verboseLog('okpush command:', okpushCommand)
 
     const supported: HookType[] = [
-      'pre-commit',
+      // 'pre-commit',
       'post-commit',
-      'post-checkout',
-      'pre-push',
-      'post-rewrite',
+      // 'post-checkout',
+      // 'pre-push',
+      // 'post-rewrite',
     ]
     for (const hook of supported) {
       let command
@@ -82,6 +84,12 @@ export class Hooks {
       } else {
         command = `${okpushCommand} ${hook}`
       }
+
+      if (config.customServer) {
+        command +=
+          '\n' + command.replace(okpushCommand, `${okpushCommand} --server ${config.server}`)
+      }
+
       this.createHook(hook, command)
     }
   }
