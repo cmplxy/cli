@@ -16,6 +16,12 @@ Install hooks for a repository that already has a `.okpush` file:
 npx okpush install
 ```
 
+Sync repository history to okpush: (by default, last 100 commits are synced)
+
+```bash
+npx okpush sync [--since <date>] [--count <number>]
+```
+
 ## Installation
 
 okpush-cli can be run directly from npx with `npx okpush`.
