@@ -9,8 +9,10 @@ import preCommit from '@/commands/pre-commit'
 import prePush from '@/commands/pre-push'
 import sync from '@/commands/sync'
 import config, { overrideServer } from '@/config'
-import { setVerbose } from '@/logger'
+import { log, setVerbose } from '@/logger'
 import { fatal } from '@/utils'
+
+import packageJson from '../package.json'
 
 export default function () {
   program
@@ -18,6 +20,10 @@ export default function () {
     .description('git hook management tool')
     .option('-v, --verbose', 'verbose logging', () => setVerbose(1))
     .option('--server <server>', 'specify a custom okpush server', overrideServer)
+    .option('--version', 'print version', () => {
+      log(packageJson.version)
+      process.exit(0)
+    })
 
   program
     .command('init')
