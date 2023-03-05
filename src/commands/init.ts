@@ -17,25 +17,22 @@ type Options = {
   force?: boolean
 }
 
-export default async function (email: string, options: Options) {
+export default async function (uuid: string, options: Options) {
   const root = findGitRoot()
   verboseLog('Initializing in', root, options)
 
   const existingConfig = readConfig(root)
 
   if (!existingConfig) {
-    await registerRepo(email, root, path.join(root, '.okpush'))
-
+    await registerRepo(uuid, root, path.join(root, '.okpush'))
     // automatically sync commits
     await sync({ internal: true, since: '90 days ago' })
-  } else if (options.force) {
+  } else {
     await Promise.all(
       Object.keys(existingConfig.remotes).map((remote) =>
-        api.initRepo(email, remote, existingConfig.remotes[remote].secret)
+        api.initRepo(uuid, remote, existingConfig.remotes[remote].secret)
       )
     )
-  } else {
-    verboseLog('Config file already exists, skipping registration')
   }
 
   const hooks = new Hooks(root)
@@ -44,7 +41,7 @@ export default async function (email: string, options: Options) {
   log(chalk.yellowBright(`\nPlease return to the okpush website for next steps.`))
 }
 
-async function registerRepo(email: string, root: string, configPath: string) {
+async function registerRepo(uuid: string, root: string, configPath: string) {
   const gitConfig = ini.parse(fs.readFileSync(path.join(root, '.git', 'config'), 'utf-8'))
 
   const remoteSections = Object.keys(gitConfig).filter((key) => key.startsWith('remote '))
@@ -83,7 +80,7 @@ async function registerRepo(email: string, root: string, configPath: string) {
 
   // attempt to register with the server
   try {
-    await api.initRepo(email, origin, secret)
+    await api.initRepo(uuid, origin, secret)
     fs.writeFileSync(configPath, JSON.stringify(initialConfig))
     git(['add', configPath])
     log(`Repository was initialized, and a config file was generated in ${configPath}.`)

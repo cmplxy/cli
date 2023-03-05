@@ -18,8 +18,8 @@ type RepoData = {
 }
 
 class API {
-  async initRepo(email: string, repo: string, secret: string): Promise<SuccessResponse> {
-    const response = await axios.post(`${config.server}/git/init`, { email, repo, secret })
+  async initRepo(uuid: string, repo: string, secret: string): Promise<SuccessResponse> {
+    const response = await axios.post(`${config.server}/git/init`, { uuid, repo, secret })
     return response.data
   }
 

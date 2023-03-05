@@ -28,7 +28,7 @@ export default function () {
   program
     .command('init')
     .description('Initialize okpush in a git repo')
-    .argument('<email>', 'Your okpush email address.')
+    .argument('<user>', 'Your okpush user id.')
     .option('--force', 'Force re-registration of the repo')
     .action(actionWrapper(init))
 
