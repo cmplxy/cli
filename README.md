@@ -4,10 +4,11 @@ okpush-cli is command-line utility to manage git hooks for the [okpush.io](https
 
 ## Usage
 
-Initialize a new repository for okpush:
+Initialize a new repository for okpush (you can find your account id by clicking "New repository" on
+the okpush website):
 
 ```bash
-npx okpush init <your email address>
+npx okpush init <account id>
 ```
 
 Install hooks for a repository that already has a `.okpush` file:
