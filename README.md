@@ -23,12 +23,18 @@ Sync repository history to okpush: (by default, last 100 commits are synced)
 npx okpush sync [--since <date>] [--count <number>]
 ```
 
+Uninstall hooks:
+
+```bash
+npx okpush uninstall
+```
+
 ## Installation
 
 okpush-cli can be run directly from npx with `npx okpush`.
 
-You can also install it into your javascript project as a dev dependency. This way you can write
-a script to automatically install okpush hooks for everyone.
+You can also install it into your nodejs project as a dev dependency. This will automatically
+install hooks if the repository is connected to okpush.
 
 ```bash
 npm install okpush --save-dev

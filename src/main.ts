@@ -9,6 +9,7 @@ import postinstall from '@/commands/postinstall'
 import preCommit from '@/commands/pre-commit'
 import prePush from '@/commands/pre-push'
 import sync from '@/commands/sync'
+import uninstall from '@/commands/uninstall'
 import config, { overrideServer } from '@/config'
 import { log, setVerbose } from '@/logger'
 import { fatal } from '@/utils'
@@ -37,6 +38,11 @@ export default function () {
     .command('install')
     .description('Install git hooks if not installed.')
     .action(actionWrapper(install))
+
+  program
+    .command('uninstall')
+    .description('Uninstall okpush git hooks.')
+    .action(actionWrapper(uninstall))
 
   program
     .command('sync')

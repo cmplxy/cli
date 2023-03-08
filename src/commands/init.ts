@@ -11,7 +11,9 @@ import { git } from '@/git'
 import { Hooks } from '@/hooks'
 import { log, verboseLog } from '@/logger'
 import { ProjectConfig } from '@/types'
-import { fatal, findGitRoot, generateSecretKey, logErrorMessage, readConfig } from '@/utils'
+import {
+    fatal, findGitRoot, generateSecretKey, logErrorMessage, readConfig, unwrapError
+} from '@/utils'
 
 type Options = {
   force?: boolean
@@ -28,11 +30,15 @@ export default async function (uuid: string, options: Options) {
     // automatically sync commits
     await sync({ internal: true, since: '90 days ago' })
   } else {
-    await Promise.all(
-      Object.keys(existingConfig.remotes).map((remote) =>
-        api.initRepo(uuid, remote, existingConfig.remotes[remote].secret)
+    try {
+      await Promise.all(
+        Object.keys(existingConfig.remotes).map((remote) =>
+          api.initRepo(uuid, remote, existingConfig.remotes[remote].secret)
+        )
       )
-    )
+    } catch (e) {
+      return fatal('Unable to register repository:', unwrapError(e))
+    }
   }
 
   const hooks = new Hooks(root)
@@ -87,6 +93,6 @@ async function registerRepo(uuid: string, root: string, configPath: string) {
     log(`Repository was initialized, and a config file was generated in ${configPath}.`)
     log(`Remember to commit the config file to your repo.`)
   } catch (e) {
-    logErrorMessage(e)
+    return fatal('Unable to register repository:', unwrapError(e))
   }
 }

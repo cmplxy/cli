@@ -16,6 +16,8 @@ type HookType =
   | 'pre-push'
   | 'post-rewrite'
 
+const SUPPORTED_HOOKS: HookType[] = ['post-commit']
+
 // helpers for working with git hooks
 export class Hooks {
   gitDir: string = ''
@@ -70,14 +72,7 @@ export class Hooks {
     const okpushCommand = argParts.join(' ')
     verboseLog('okpush command:', okpushCommand)
 
-    const supported: HookType[] = [
-      // 'pre-commit',
-      'post-commit',
-      // 'post-checkout',
-      // 'pre-push',
-      // 'post-rewrite',
-    ]
-    for (const hook of supported) {
+    for (const hook of SUPPORTED_HOOKS) {
       let command
       if (hook.startsWith('post')) {
         command = `nohup ${okpushCommand} ${hook} &>/dev/null &`
@@ -91,6 +86,26 @@ export class Hooks {
       }
 
       this.createHook(hook, command)
+    }
+  }
+
+  uninstallHooks() {
+    for (const hook of SUPPORTED_HOOKS) {
+      const file = this.getHook(hook)
+      if (!fs.existsSync(file)) continue
+
+      const contents = fs.readFileSync(file, 'utf-8')
+      const filteredContents = contents
+        .split('\n')
+        .filter((line) => !line.includes('okpush'))
+        .join('\n')
+
+      const trimmed = filteredContents.trim()
+      if (trimmed.startsWith('#') && !trimmed.includes('\n')) {
+        fs.rmSync(file)
+      } else {
+        fs.writeFileSync(file, trimmed)
+      }
     }
   }
 }
