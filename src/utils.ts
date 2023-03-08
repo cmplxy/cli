@@ -9,8 +9,8 @@ import { overrideServer } from '@/config'
 import { ProjectConfig } from '@/types'
 
 // walk up the tree until we find the .git folder
-export function findGitRoot() {
-  let dir = process.cwd()
+export function findGitRoot(cwd?: string) {
+  let dir = cwd || process.cwd()
   while (dir !== '/') {
     if (fs.existsSync(path.join(dir, '.git'))) return dir
     dir = path.dirname(dir)
