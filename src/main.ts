@@ -5,6 +5,7 @@ import install from '@/commands/install'
 import postCheckout from '@/commands/post-checkout'
 import postCommit from '@/commands/post-commit'
 import postRewrite from '@/commands/post-rewrite'
+import postinstall from '@/commands/postinstall'
 import preCommit from '@/commands/pre-commit'
 import prePush from '@/commands/pre-push'
 import sync from '@/commands/sync'
@@ -54,6 +55,8 @@ export default function () {
   program.command('pre-commit', hookOpts).action(actionWrapper(preCommit))
 
   program.command('pre-push', hookOpts).action(actionWrapper(prePush))
+
+  program.command('postinstall', hookOpts).action(actionWrapper(postinstall))
 
   const options = program.parse()
   config.options = options
