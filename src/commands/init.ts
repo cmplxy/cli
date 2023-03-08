@@ -51,18 +51,19 @@ async function registerRepo(uuid: string, root: string, configPath: string) {
 
   // determin the origin
   let origin: string | undefined
-  if (remoteSections.length > 1) {
+  const originUrls = [...new Set(remoteSections.map((rs) => gitConfig[rs].url))]
+  if (originUrls.length > 1) {
     const { remote } = await inquirer.prompt([
       {
         type: 'list',
         name: 'remote',
         message: 'Select primary repository your team uses to collaborate:',
-        choices: remoteSections.map((section) => gitConfig[section].url),
+        choices: originUrls,
       },
     ])
     origin = remote
   } else {
-    origin = gitConfig[remoteSections[0]].url
+    origin = originUrls[0]
   }
 
   if (!origin) return fatal('No remote specified')
