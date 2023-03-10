@@ -16,37 +16,6 @@ export default async function (opts: Options) {
   } else {
     await postCommitAsync()
   }
-
-  // const config = readConfig()
-  // if (!config) return
-
-  // const result = await gitShow()
-  // const branch = await gitBranch()
-
-  // try {
-  //   await Promise.all(
-  //     Object.keys(config.remotes).map(async (remote) => {
-  //       const secret = config.remotes[remote].secret
-  //       const repo = { repo: remote, secret }
-  //       return api.sendCommit(repo, branch, result).then((response) => {
-  //         if (response.sync_url) {
-  //           verboseLog(`Sync URL: ${response.sync_url}`)
-  //           const syncBranch = `okpush/${result.email}/${branch}`
-  //           let pushUrl
-  //           if (remote.startsWith('git@')) {
-  //             pushUrl = `git@${response.sync_url}`
-  //           } else {
-  //             pushUrl = `https://${response.sync_url.replace(':', '/')}`
-  //           }
-
-  //           git(['push', '--no-verify', '-f', pushUrl, `HEAD:${syncBranch}`])
-  //         }
-  //       })
-  //     })
-  //   )
-  // } catch (e) {
-  //   verboseLog(unwrapError(e))
-  // }
 }
 
 const SYNC_REQ_TIMEOUT = 1000
@@ -58,7 +27,8 @@ async function postCommitSync(opts: Options) {
 
   try {
     await runPostCommitHook(timeout, (command) => {
-      const stringCommand = command.join(' ')
+      const stringCommand = 'git ' + command.join(' ')
+      verboseLog(`nohup: ${stringCommand}`)
       nohup(stringCommand)
     })
   } catch (e) {
@@ -69,6 +39,7 @@ async function postCommitSync(opts: Options) {
 
 function runAsync() {
   const command = process.argv.map((p) => (p.includes(' ') ? `"${p}"` : p)).join(' ') + ' --async'
+  verboseLog(`nohup: ${command}`)
   nohup(command)
 }
 
