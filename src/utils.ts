@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios'
 import chalk from 'chalk'
+import { exec, ExecException, ExecOptions } from 'child_process'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -65,4 +66,34 @@ export function error(...args: any[]) {
 export function fatal(...args: any[]) {
   console.error(chalk.red('Fatal:'), ...args)
   process.exit(1)
+}
+
+// from https://gist.github.com/supersha/6913695
+export function nohup(
+  cmd: string,
+  options?: ExecOptions | null,
+  callback?:
+    | ((error?: ExecException | null, stdout?: string | Buffer, stderr?: string | Buffer) => void)
+    | undefined
+) {
+  const isWin = process.platform.indexOf('win') === 0
+  if (typeof options === 'function') {
+    callback = options
+    options = null
+  }
+  if (isWin) {
+    var cmdEscape = cmd.replace(/"/g, '""'),
+      file = '.nohup.cmd.vbs',
+      script = ''
+    script += 'Dim shell\n'
+    script += 'Set shell=Wscript.CreateObject("WScript.Shell")\n'
+    script += 'shell.Run "cmd.exe /c start /b ' + cmdEscape + '", 0, TRUE'
+    fs.writeFileSync(file, script)
+    exec('cscript.exe /nologo "' + file + '"', options, function () {
+      fs.unlinkSync(file)
+      if (callback) callback()
+    })
+  } else {
+    exec('nohup ' + cmd + ' > /dev/null 2>&1 &', options, callback)
+  }
 }
