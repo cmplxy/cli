@@ -56,14 +56,18 @@ async function postCommitAsync() {
 async function runPostCommitHook(timeout: number | undefined, onPush: (command: string[]) => void) {
   const config = readConfig()
   if (!config) return
-  const result = await gitShow()
-  const branch = await gitBranch()
+  const result = gitShow()
+  const branch = gitBranch()
 
   await Promise.any(
     Object.keys(config.remotes).map(async (remote) => {
       const secret = config.remotes[remote].secret
       const repo = { repo: remote, secret }
       return api.sendCommit(repo, branch, result, timeout).then((response) => {
+        if (response.message) {
+          console.log(response.message)
+        }
+
         if (response.sync_url) {
           verboseLog(`Sync URL: ${response.sync_url}`)
           const syncBranch = `okpush/${result.email}/${branch}`
