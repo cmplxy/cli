@@ -5,6 +5,7 @@ import { git, gitBranch, gitShow } from '@/git'
 import { verboseLog } from '@/logger'
 import { nohup, readConfig, unwrapError } from '@/utils'
 import notifier from 'node-notifier'
+import child_process from 'child_process'
 
 type Options = {
   async?: boolean
@@ -66,10 +67,22 @@ async function runPostCommitHook(timeout: number | undefined, onPush: (command: 
       const repo = { repo: remote, secret }
       return api.sendCommit(repo, branch, result, timeout).then((response) => {
         if (response.message) {
-          notifier.notify({
-            title: 'okpush',
-            message: response.message,
-          })
+          try {
+            if (process.platform == 'darwin') {
+              child_process.exec(
+                'osascript -e \'display notification "' +
+                  response.message +
+                  '" with title "okpush"\''
+              )
+            } else {
+              notifier.notify({
+                title: 'okpush',
+                message: response.message,
+              })
+            }
+          } catch (e) {
+            verboseLog('Error sending notification: ', e)
+          }
         }
 
         if (response.sync_url) {
