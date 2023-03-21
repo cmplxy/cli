@@ -73,12 +73,7 @@ export class Hooks {
     verboseLog('okpush command:', okpushCommand)
 
     for (const hook of SUPPORTED_HOOKS) {
-      let command
-      if (hook.startsWith('post')) {
-        command = `nohup ${okpushCommand} ${hook} &>/dev/null &`
-      } else {
-        command = `${okpushCommand} ${hook}`
-      }
+      let command = `${okpushCommand} ${hook}`
 
       if (config.customServer) {
         command +=
