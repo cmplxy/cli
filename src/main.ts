@@ -54,7 +54,11 @@ export default function () {
   const hookOpts = { hidden: true }
   program.command('post-checkout', hookOpts).action(actionWrapper(postCheckout))
 
-  program.command('post-commit', hookOpts).action(actionWrapper(postCommit))
+  program
+    .command('post-commit', hookOpts)
+    .option('--async')
+    .option('--timeout <timeout>')
+    .action(actionWrapper(postCommit))
 
   program.command('post-rewrite', hookOpts).action(actionWrapper(postRewrite))
 

@@ -26,9 +26,14 @@ class API {
   async sendCommit(
     repo: RepoData,
     branch: string,
-    data: GitShowData
+    data: GitShowData,
+    timeout?: number
   ): Promise<{ sync_url?: string }> {
-    const response = await axios.post(`${config.server}/git/commit`, { branch, ...repo, ...data })
+    const response = await axios.post(
+      `${config.server}/git/commit`,
+      { branch, ...repo, ...data },
+      { timeout }
+    )
     return response.data
   }
 
