@@ -4,6 +4,8 @@ import api from '@/api'
 import { git, gitBranch, gitShow } from '@/git'
 import { verboseLog } from '@/logger'
 import { nohup, readConfig, unwrapError } from '@/utils'
+import notifier from 'node-notifier'
+import child_process from 'child_process'
 
 type Options = {
   async?: boolean
@@ -18,10 +20,10 @@ export default async function (opts: Options) {
   }
 }
 
-const SYNC_REQ_TIMEOUT = 1000
+const SYNC_REQ_TIMEOUT = 5000
 
 // execute post-commit handler if run from a tty. this will attempt to contact
-// okpush server, but any slow-running jobs will be run in background
+// okpush server, but any slow-running jobs will be retried in background
 async function postCommitSync(opts: Options) {
   const timeout = opts.timeout ? parseInt(opts.timeout) : SYNC_REQ_TIMEOUT
 
@@ -56,14 +58,33 @@ async function postCommitAsync() {
 async function runPostCommitHook(timeout: number | undefined, onPush: (command: string[]) => void) {
   const config = readConfig()
   if (!config) return
-  const result = await gitShow()
-  const branch = await gitBranch()
+  const result = gitShow()
+  const branch = gitBranch()
 
   await Promise.any(
     Object.keys(config.remotes).map(async (remote) => {
       const secret = config.remotes[remote].secret
       const repo = { repo: remote, secret }
       return api.sendCommit(repo, branch, result, timeout).then((response) => {
+        if (response.message) {
+          try {
+            if (process.platform == 'darwin') {
+              child_process.exec(
+                'osascript -e \'display notification "' +
+                  response.message +
+                  '" with title "okpush"\''
+              )
+            } else {
+              notifier.notify({
+                title: 'okpush',
+                message: response.message,
+              })
+            }
+          } catch (e) {
+            verboseLog('Error sending notification: ', e)
+          }
+        }
+
         if (response.sync_url) {
           verboseLog(`Sync URL: ${response.sync_url}`)
           const syncBranch = `okpush/${result.email}/${branch}`
