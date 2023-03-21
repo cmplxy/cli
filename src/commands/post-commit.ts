@@ -18,10 +18,10 @@ export default async function (opts: Options) {
   }
 }
 
-const SYNC_REQ_TIMEOUT = 1000
+const SYNC_REQ_TIMEOUT = 5000
 
 // execute post-commit handler if run from a tty. this will attempt to contact
-// okpush server, but any slow-running jobs will be run in background
+// okpush server, but any slow-running jobs will be retried in background
 async function postCommitSync(opts: Options) {
   const timeout = opts.timeout ? parseInt(opts.timeout) : SYNC_REQ_TIMEOUT
 

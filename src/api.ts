@@ -28,7 +28,7 @@ class API {
     branch: string,
     data: GitShowData,
     timeout?: number
-  ): Promise<{ message?: string; sync_url?: string }> {
+  ): Promise<{ message?: string; color?: string; sync_url?: string }> {
     const response = await axios.post(
       `${config.server}/git/commit`,
       { branch, ...repo, ...data },
