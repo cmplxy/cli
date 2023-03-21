@@ -1,5 +1,4 @@
 #!/bin/sh
 
 
-node /Users/timsu/projects/okpush-cli/cli.js post-commit
-node /Users/timsu/projects/okpush-cli/cli.js --server http://localhost:3400 post-commit
+nohup node /Users/timsu/projects/okpush-cli/cli.js post-commit &>/dev/null &

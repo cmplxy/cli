@@ -4,6 +4,7 @@ import api from '@/api'
 import { git, gitBranch, gitShow } from '@/git'
 import { verboseLog } from '@/logger'
 import { nohup, readConfig, unwrapError } from '@/utils'
+import notifier from 'node-notifier'
 
 type Options = {
   async?: boolean
@@ -65,7 +66,10 @@ async function runPostCommitHook(timeout: number | undefined, onPush: (command: 
       const repo = { repo: remote, secret }
       return api.sendCommit(repo, branch, result, timeout).then((response) => {
         if (response.message) {
-          console.log(response.message)
+          notifier.notify({
+            title: 'okpush',
+            message: response.message,
+          })
         }
 
         if (response.sync_url) {
