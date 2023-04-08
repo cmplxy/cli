@@ -33,7 +33,7 @@
     "chalk": "^4.1.2",
     "commander": "^9.4.1",
     "ini": "^3.0.1",
-    "inquirer": "^9.1.4",
+    "inquirer": "^9.1.5",
     "node-notifier": "^10.0.1"
   },
   "devDependencies": {
